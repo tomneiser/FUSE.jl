@@ -70,14 +70,27 @@ function feature_or_master(package, feature_branch) ;\
     token = "$(PTP_READ_TOKEN)" ;\
     url = "https://api.github.com/repos/ProjectTorreyPines/$$(package).jl/branches/$$(feature_branch)" ;\
     headers = ["Authorization" => "Bearer $$(token)", "Accept" => "application/vnd.github+json", "X-GitHub-Api-Version" => "2022-11-28"] ;\
-    response = HTTP.get(url, headers; status_exception=false) ;\
-    if response.status == 200 ;\
-        return feature_branch ;\
-    elseif response.status == 404 ;\
-        return "master" ;\
-    else ;\
-        error("GitHub API returned status code: $$(response.status)") ;\
+    max_retries = 6 ;\
+    for attempt in 1:max_retries ;\
+        try ;\
+            response = HTTP.get(url, headers; status_exception=false, connect_timeout=30, readtimeout=120) ;\
+            if response.status == 200 ;\
+                return feature_branch ;\
+            elseif response.status == 404 ;\
+                return "master" ;\
+            elseif response.status in (429, 502, 503) ;\
+                attempt >= max_retries && error("GitHub API returned status code: $$(response.status) after $$(max_retries) attempts for $$(package)") ;\
+                sleep(min(60, 2^attempt)) ;\
+            else ;\
+                error("GitHub API returned status code: $$(response.status) for $$(package)") ;\
+            end ;\
+        catch e ;\
+            attempt >= max_retries && rethrow(e) ;\
+            @warn "GitHub API request failed (attempt $$(attempt)/$$(max_retries)) for $$(package).jl" exception=e ;\
+            sleep(min(60, 2^attempt)) ;\
+        end ;\
     end ;\
+    error("GitHub API request failed after $$(max_retries) attempts for $$(package)") ;\
 end
 endef
 
