@@ -30,8 +30,7 @@ FUSE and related packages are registered at the [FuseRegistry](https://github.co
 Start Julia (`julia` at the terminal), then:
 
 1. Add the `FuseRegistry` and the `FUSE` package (a fresh install typically takes **15–30 minutes** to
-   download and precompile dependencies; allow **20–40 minutes** end-to-end for the full sequence below,
-   including the smoke test):
+   download and precompile dependencies):
 
    ```julia
    using Pkg
