@@ -42,7 +42,7 @@ message WireDataForFUSE {
                                             //   1:PCECOILA  2:PCE89DN   3:PCE567UP  4:PCECOILB
                                             //   5:PCE89UP   6:PCE567DN  7:PCF1A ... 15:PCF9A
                                             //  16:PCF1B ... 24:PCF9B
-    repeated double psizr = 8;              // flat flux matrix psi(R,Z) [Wb/rad], R-fast
+    repeated double psizr = 8;              // flat flux matrix psi(R,Z), R-fast; units/sign per `cocos` (GSLite sends full [Wb], e_Bp=1)
     repeated double r_grid = 9;             // R grid points [m]
     repeated double z_grid = 10;            // Z grid points [m]
     repeated double pinj_per_beam = 11;     // NBI injected power per beam [W]

@@ -173,7 +173,7 @@ WireDataForFUSE fields (matching C++ struct):
                                         16:PCF1B..24:PCF9B
                                        PedestalPredictor FPE consumes ecoila (idx 1), ecoilb (idx 4),
                                        and f1a..f9b (idx 7..24); the C-coil entries (idx 2,3,5,6) are unused.
-- `psizr`:           double[NGG]      — Flat flux matrix ψ(R,Z) [Wb/rad], reshaped to (nR, nZ)
+- `psizr`:           double[NGG]      — Flat flux matrix ψ(R,Z), reshaped to (nR, nZ); units/sign per `cocos`
 - `pinj_per_beam`:   double[NNBI]     — NBI injected power per beam [W] → pulse_schedule.nbi
 - `nbi_acc_voltage`: double[NNBI]     — NBI acceleration voltage per beam [eV] → pulse_schedule.nbi
 - `gas_cal`:         double[NGAS]     — Gas calibration values → dd._aux (for NN ne predictor)
@@ -374,7 +374,7 @@ function receive!(actor::ActorZMQ)
         end
         psi_rz = reshape(psizr_flat, nR, nZ)  # GSLite stores column-major (R varies fastest)
         if f_PSI != 1.0
-            psi_rz = f_PSI .* psi_rz  # wire COCOS -> 11 (e.g. [Wb/rad] -> [Wb] and psi sign)
+            psi_rz = f_PSI .* psi_rz  # wire COCOS -> 11 (sign and/or 2π per the declared convention)
         end
 
         rgrid = range(dim1[1], dim1[end], length=nR)
